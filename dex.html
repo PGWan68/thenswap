@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BC DEX - 去中心化交易所</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.6;
+        }
+
+        .App {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .wallet-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .connected-wallet {
+            display: flex;
+            align-items: center;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #238636;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #2ea043;
+        }
+
+        button:disabled {
+            background-color: #30363d;
+            cursor: not-allowed;
+        }
+
+        input, select {
+            background-color: #161b22;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #238636;
+            box-shadow: 0 0 0 3px rgba(35, 134, 54, 0.1);
+        }
+
+        .card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #30363d;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .welcome-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 0.5rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .token-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .token-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background-color: #0d1117;
+            border-radius: 0.5rem;
+            border: 1px solid #30363d;
+        }
+
+        .token-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .token-symbol {
+            font-weight: 600;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .token-name {
+            font-size: 0.9rem;
+            color: #8b949e;
+        }
+
+        .token-balance {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.25rem;
+        }
+
+        .token-value {
+            font-size: 0.9rem;
+            color: #8b949e;
+        }
+
+        .token-price {
+            font-weight: 500;
+        }
+
+        .swap-card {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .swap-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .swap-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .swap-input-group label {
+            font-weight: 500;
+            color: white;
+        }
+
+        .swap-arrow {
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+
+        .swap-arrow button {
+            background-color: transparent;
+            color: #238636;
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .swap-arrow button:hover {
+            background-color: rgba(35, 134, 54, 0.1);
+        }
+
+        .swap-button {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            padding: 1rem;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid #30363d;
+            text-align: center;
+            color: #8b949e;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .welcome-section {
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="App">
+        <header class="header">
+            <h1>BC DEX</h1>
+            <div class="wallet-section">
+                <button id="connectWalletBtn">连接钱包</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div id="welcomeSection" class="welcome-section">
+                <h2>欢迎使用 BC DEX</h2>
+                <p>请连接您的钱包开始交易</p>
+                <button id="welcomeConnectBtn" style="margin-top: 1rem; font-size: 1.2rem; padding: 1rem 2rem;">
+                    连接钱包
+                </button>
+            </div>
+
+            <div id="dashboard" class="dashboard" style="display: none;">
+                <div class="left-panel">
+                    <div class="card">
+                        <h2>我的资产</h2>
+                        <ul id="userTokensList" class="token-list">
+                            <!-- 用户代币列表将动态生成 -->
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h2>可交易代币</h2>
+                        <ul id="availableTokensList" class="token-list">
+                            <!-- 可交易代币列表将动态生成 -->
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <div class="card swap-card">
+                        <h2>代币兑换</h2>
+                        <div class="swap-form">
+                            <div class="swap-input-group">
+                                <label>发送</label>
+                                <input
+                                    type="number"
+                                    id="fromAmount"
+                                    placeholder="输入数量"
+                                    step="0.000001"
+                                />
+                                <select id="fromToken">
+                                    <!-- 代币选项将动态生成 -->
+                                </select>
+                            </div>
+
+                            <div class="swap-arrow">
+                                <button id="swapTokensBtn">↓↑</button>
+                            </div>
+
+                            <div class="swap-input-group">
+                                <label>接收</label>
+                                <input
+                                    type="number"
+                                    id="toAmount"
+                                    placeholder="预估数量"
+                                    readonly
+                                    step="0.000001"
+                                />
+                                <select id="toToken">
+                                    <!-- 代币选项将动态生成 -->
+                                </select>
+                            </div>
+
+                            <button id="swapBtn" class="swap-button">确认兑换</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>BC DEX - 去中心化交易所 © 2024</p>
+        </footer>
+    </div>
+
+    <script>
+        // 模拟代币数据
+        const availableTokens = [
+            { symbol: 'ETH', name: 'Ethereum', address: '0x0000000000000000000000000000000000000000', balance: 1.5, price: 3000 },
+            { symbol: 'USDC', name: 'USD Coin', address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', balance: 1000, price: 1 },
+            { symbol: 'UNI', name: 'Uniswap', address: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', balance: 50, price: 15 },
+            { symbol: 'DAI', name: 'Dai Stablecoin', address: '0x6b175474e89094c44da98b954eedeac495271d0f', balance: 0, price: 1 },
+            { symbol: 'LINK', name: 'Chainlink', address: '0x514910771af9ca656af840dff83e8264ecf986ca', balance: 0, price: 18 },
+        ];
+
+        let walletConnected = false;
+        let walletAddress = '0x742d35Cc6634C0532925a3b80152609BCd365714';
+        let userTokens = [];
+        let fromToken = 'ETH';
+        let toToken = 'USDC';
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 绑定事件
+            document.getElementById('connectWalletBtn').addEventListener('click', connectWallet);
+            document.getElementById('welcomeConnectBtn').addEventListener('click', connectWallet);
+            document.getElementById('swapBtn').addEventListener('click', handleSwap);
+            document.getElementById('swapTokensBtn').addEventListener('click', swapTokens);
+            document.getElementById('fromAmount').addEventListener('input', calculateSwap);
+            document.getElementById('fromToken').addEventListener('change', calculateSwap);
+            document.getElementById('toToken').addEventListener('change', calculateSwap);
+
+            // 填充代币选项
+            populateTokenSelects();
+            populateAvailableTokens();
+        });
+
+        // 连接钱包
+        function connectWallet() {
+            // 模拟连接钱包
+            walletConnected = true;
+            
+            // 获取用户代币
+            userTokens = availableTokens.filter(token => token.balance > 0);
+            
+            // 更新界面
+            updateUI();
+        }
+
+        // 更新界面
+        function updateUI() {
+            if (walletConnected) {
+                // 显示钱包地址
+                const walletSection = document.querySelector('.wallet-section');
+                walletSection.innerHTML = `
+                    <div class="connected-wallet">
+                        <span>${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}</span>
+                        <button id="disconnectWalletBtn" style="margin-left: '1rem'">断开连接</button>
+                    </div>
+                `;
+                document.getElementById('disconnectWalletBtn').addEventListener('click', disconnectWallet);
+
+                // 隐藏欢迎界面，显示仪表盘
+                document.getElementById('welcomeSection').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'grid';
+
+                // 填充用户代币列表
+                populateUserTokens();
+            } else {
+                // 显示连接按钮
+                const walletSection = document.querySelector('.wallet-section');
+                walletSection.innerHTML = `
+                    <button id="connectWalletBtn">连接钱包</button>
+                `;
+                document.getElementById('connectWalletBtn').addEventListener('click', connectWallet);
+
+                // 显示欢迎界面，隐藏仪表盘
+                document.getElementById('welcomeSection').style.display = 'block';
+                document.getElementById('dashboard').style.display = 'none';
+            }
+        }
+
+        // 断开钱包连接
+        function disconnectWallet() {
+            walletConnected = false;
+            userTokens = [];
+            updateUI();
+        }
+
+        // 填充代币选择器
+        function populateTokenSelects() {
+            const fromTokenSelect = document.getElementById('fromToken');
+            const toTokenSelect = document.getElementById('toToken');
+
+            availableTokens.forEach(token => {
+                const option1 = document.createElement('option');
+                option1.value = token.symbol;
+                option1.textContent = token.symbol;
+                fromTokenSelect.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = token.symbol;
+                option2.textContent = token.symbol;
+                toTokenSelect.appendChild(option2);
+            });
+
+            // 设置默认值
+            fromTokenSelect.value = fromToken;
+            toTokenSelect.value = toToken;
+        }
+
+        // 填充用户代币列表
+        function populateUserTokens() {
+            const userTokensList = document.getElementById('userTokensList');
+            userTokensList.innerHTML = '';
+
+            userTokens.forEach((token, index) => {
+                const li = document.createElement('li');
+                li.className = 'token-item';
+                li.innerHTML = `
+                    <div class="token-info">
+                        <span class="token-symbol">${token.symbol}</span>
+                        <span class="token-name">${token.name}</span>
+                    </div>
+                    <div class="token-balance">
+                        <span>${token.balance.toFixed(6)} ${token.symbol}</span>
+                        <span class="token-value">
+                            $${(token.balance * token.price).toFixed(2)}
+                        </span>
+                    </div>
+                `;
+                userTokensList.appendChild(li);
+            });
+        }
+
+        // 填充可交易代币列表
+        function populateAvailableTokens() {
+            const availableTokensList = document.getElementById('availableTokensList');
+            availableTokensList.innerHTML = '';
+
+            availableTokens.forEach((token, index) => {
+                const li = document.createElement('li');
+                li.className = 'token-item';
+                li.innerHTML = `
+                    <div class="token-info">
+                        <span class="token-symbol">${token.symbol}</span>
+                        <span class="token-name">${token.name}</span>
+                    </div>
+                    <div class="token-price">
+                        $${token.price.toFixed(2)}
+                    </div>
+                `;
+                availableTokensList.appendChild(li);
+            });
+        }
+
+        // 交换代币
+        function swapTokens() {
+            const fromTokenSelect = document.getElementById('fromToken');
+            const toTokenSelect = document.getElementById('toToken');
+            const fromAmountInput = document.getElementById('fromAmount');
+            const toAmountInput = document.getElementById('toAmount');
+
+            // 交换值
+            const tempToken = fromTokenSelect.value;
+            fromTokenSelect.value = toTokenSelect.value;
+            toTokenSelect.value = tempToken;
+
+            const tempAmount = fromAmountInput.value;
+            fromAmountInput.value = toAmountInput.value;
+            toAmountInput.value = tempAmount;
+
+            calculateSwap();
+        }
+
+        // 计算兑换金额
+        function calculateSwap() {
+            const fromAmount = parseFloat(document.getElementById('fromAmount').value);
+            const fromTokenSymbol = document.getElementById('fromToken').value;
+            const toTokenSymbol = document.getElementById('toToken').value;
+
+            if (!fromAmount || isNaN(fromAmount) || fromAmount <= 0) {
+                document.getElementById('toAmount').value = '';
+                return;
+            }
+
+            const fromTokenData = availableTokens.find(token => token.symbol === fromTokenSymbol);
+            const toTokenData = availableTokens.find(token => token.symbol === toTokenSymbol);
+
+            if (!fromTokenData || !toTokenData) return;
+
+            const fromValue = fromAmount * fromTokenData.price;
+            const calculatedToAmount = fromValue / toTokenData.price;
+            
+            document.getElementById('toAmount').value = calculatedToAmount.toFixed(6);
+        }
+
+        // 处理兑换
+        function handleSwap() {
+            const fromAmount = parseFloat(document.getElementById('fromAmount').value);
+            const fromTokenSymbol = document.getElementById('fromToken').value;
+            const toAmount = parseFloat(document.getElementById('toAmount').value);
+            const toTokenSymbol = document.getElementById('toToken').value;
+
+            if (!fromAmount || isNaN(fromAmount) || fromAmount <= 0) {
+                alert('请输入有效的兑换数量');
+                return;
+            }
+
+            // 模拟交易成功
+            alert(`成功兑换 ${fromAmount} ${fromTokenSymbol} 为 ${toAmount.toFixed(6)} ${toTokenSymbol}`);
+
+            // 清空输入
+            document.getElementById('fromAmount').value = '';
+            document.getElementById('toAmount').value = '';
+        }
+    </script>
+</body>
+</html>
