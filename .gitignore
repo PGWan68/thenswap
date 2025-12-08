@@ -24,8 +24,8 @@ dist-ssr
 *.sw?
 
 # Hardhat artifacts
-artifacts/
-cache/
+/artifacts/
+/cache/
 
 # Testing
 coverage/
