@@ -58,13 +58,56 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  padding-bottom: 1rem;
+  padding: 1rem 0;
   border-bottom: 1px solid #30363d;
+  background-color: #161b22;
+  border-radius: 0.5rem;
 }
 
-.header h1 {
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
   margin: 0;
   font-size: 1.8rem;
+  color: #238636;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.logo:hover {
+  color: #2ea043;
+}
+
+.nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-button {
+  background-color: transparent;
+  color: #c9d1d9;
+  border: 1px solid transparent;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.nav-button:hover {
+  background-color: rgba(35, 134, 54, 0.1);
+  color: #238636;
+  border-color: #238636;
+}
+
+.nav-button.active {
+  background-color: rgba(35, 134, 54, 0.1);
+  color: #238636;
+  border-color: #238636;
 }
 
 .wallet-section {
@@ -75,10 +118,19 @@ body {
 .connected-wallet {
   display: flex;
   align-items: center;
+  gap: 1rem;
 }
 
-button {
-  cursor: pointer;
+.wallet-address {
+  color: #c9d1d9;
+  background-color: #0d1117;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #30363d;
+  font-size: 0.9rem;
+}
+
+.connect-button {
   background-color: #238636;
   color: white;
   border: none;
@@ -89,13 +141,46 @@ button {
   transition: background-color 0.2s;
 }
 
-button:hover {
+.connect-button:hover {
   background-color: #2ea043;
+}
+
+.disconnect-button {
+  background-color: #30363d;
+  color: #c9d1d9;
+  border: 1px solid #484f58;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.disconnect-button:hover {
+  background-color: #484f58;
+  border-color: #586069;
 }
 
 button:disabled {
   background-color: #30363d;
   cursor: not-allowed;
+  border-color: #484f58;
+}
+
+.primary-button {
+  background-color: #238636;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  margin-top: 1rem;
+}
+
+.primary-button:hover {
+  background-color: #2ea043;
 }
 
 input, select {
@@ -268,13 +353,309 @@ li:last-child {
   padding: 1rem;
 }
 
+.content-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
 .footer {
   margin-top: 3rem;
+  padding: 2rem 0;
+  border-top: 1px solid #30363d;
+  background-color: #161b22;
+  border-radius: 0.5rem;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  gap: 2rem;
+}
+
+.footer-section {
+  flex: 1;
+  min-width: 200px;
+}
+
+.footer-section h3 {
+  color: #238636;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.footer-section h4 {
+  color: #c9d1d9;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-section li {
+  color: #8b949e;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.footer-section li:hover {
+  color: #c9d1d9;
+}
+
+.footer-bottom {
+  margin-top: 2rem;
   padding-top: 1rem;
   border-top: 1px solid #30363d;
   text-align: center;
   color: #8b949e;
   font-size: 0.9rem;
+}
+
+/* 功能组件通用样式 */
+.section-title {
+  color: #c9d1d9;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.feature-card {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+/* Home Component Styles */
+.home-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.hero-section {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.hero-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.hero-section p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-cta {
+  margin-top: 2rem;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.portfolio-overview {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  background-color: #1f2029;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.total-assets {
+  margin-top: 1rem;
+}
+
+.total-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #667eea;
+  margin-bottom: 0.5rem;
+}
+
+.asset-desc {
+  font-size: 1rem;
+  color: #a0a0a0;
+}
+
+.tokens-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.token-card {
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.token-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.token-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.token-symbol {
+  font-weight: bold;
+  color: white;
+}
+
+.token-name {
+  font-size: 0.8rem;
+  color: #a0a0a0;
+}
+
+.token-price {
+  font-weight: bold;
+  color: #667eea;
+  text-align: right;
+}
+
+/* Swap Component Styles */
+.swap-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #1f2029;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.swap-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Liquidity Pool 组件样式 */
+.liquidity-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.pools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+/* NFT Market 组件样式 */
+.nft-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.nft-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.nft-card {
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.nft-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.nft-image {
+  width: 100%;
+  height: 200px;
+  background-color: #30363d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b949e;
+  font-size: 1.2rem;
+}
+
+.nft-info {
+  padding: 1rem;
+}
+
+/* Staking 组件样式 */
+.staking-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.staking-pools {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.staking-pool {
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+/* Portfolio 组件样式 */
+.portfolio-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.wallet-info {
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.top-wallets {
+  margin-top: 3rem;
+}
+
+.wallets-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
 }
 
 @media (max-width: 768px) {

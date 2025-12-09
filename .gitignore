@@ -42,3 +42,7 @@ deploy-output.txt
 # Temporary test files
 test-*.js
 test-*.html
+
+.vscode/
+
+package-lock.json

@@ -1,28 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { CONTRACT_ADDRESSES, TOKEN_ABI, DEX_ABI } from './contractsConfig';
+import Swap from './components/Swap';
+import LiquidityPool from './components/LiquidityPool';
+import NFTMarket from './components/NFTMarket';
+import Staking from './components/Staking';
+import Portfolio from './components/Portfolio';
 
 // 真实部署的代币数据
-const availableTokens = [
+export const availableTokens = [
   { symbol: 'ETH', name: 'Ethereum', address: CONTRACT_ADDRESSES.ETH, balance: 0, price: 3000, decimals: 18 },
   { symbol: 'USDT', name: 'Tether USD', address: CONTRACT_ADDRESSES.USDT, balance: 0, price: 1, decimals: 18 },
   { symbol: 'DAI', name: 'Dai Stablecoin', address: CONTRACT_ADDRESSES.DAI, balance: 0, price: 1, decimals: 18 },
+  { symbol: 'THEN', name: 'Then Token', address: CONTRACT_ADDRESSES.THEN || '0x', balance: 0, price: 0.5, decimals: 18 },
 ];
 
 function App() {
   const [walletConnected, setWalletConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
+  const [currentPage, setCurrentPage] = useState('home');
   const [userTokens, setUserTokens] = useState([]);
-  const [fromToken, setFromToken] = useState('ETH');
-  const [toToken, setToToken] = useState('USDT');
-  const [fromAmount, setFromAmount] = useState('');
-  const [toAmount, setToAmount] = useState('');
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
   const [dexContract, setDexContract] = useState(null);
   const [tokenContracts, setTokenContracts] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [isSwapping, setIsSwapping] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [tokenPrices, setTokenPrices] = useState({});
@@ -306,17 +308,57 @@ function App() {
   return (
     <div className="App">
       <header className="header">
-        <h1>BC DEX</h1>
+        <div className="logo-container">
+          <h1 onClick={() => setCurrentPage('home')} className="logo">ThenSwap</h1>
+        </div>
+        <nav className="nav">
+          <button 
+            className={`nav-button ${currentPage === 'home' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('home')}
+          >
+            Home
+          </button>
+          <button 
+            className={`nav-button ${currentPage === 'swap' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('swap')}
+          >
+            Swap
+          </button>
+          <button 
+            className={`nav-button ${currentPage === 'liquidity' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('liquidity')}
+          >
+            Liquidity Pool
+          </button>
+          <button 
+            className={`nav-button ${currentPage === 'nft' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('nft')}
+          >
+            NFT Market
+          </button>
+          <button 
+            className={`nav-button ${currentPage === 'staking' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('staking')}
+          >
+            Staking
+          </button>
+          <button 
+            className={`nav-button ${currentPage === 'portfolio' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('portfolio')}
+          >
+            Portfolio
+          </button>
+        </nav>
         <div className="wallet-section">
           {walletConnected ? (
             <div className="connected-wallet">
-              <span>{walletAddress.substring(0, 6)}...{walletAddress.substring(walletAddress.length - 4)}</span>
-              <button onClick={disconnectWallet} style={{ marginLeft: '1rem' }}>
+              <span className="wallet-address">{walletAddress.substring(0, 6)}...{walletAddress.substring(walletAddress.length - 4)}</span>
+              <button className="disconnect-button" onClick={disconnectWallet}>
                 断开连接
               </button>
             </div>
           ) : (
-            <button onClick={connectWallet}>
+            <button className="connect-button" onClick={connectWallet}>
               连接钱包
             </button>
           )}
@@ -334,129 +376,106 @@ function App() {
             {successMessage}
           </div>
         )}
-        {walletConnected && (
-          <div className="dashboard">
-            <div className="left-panel">
-              <div className="card">
-                <h2>我的资产</h2>
-                {isLoading ? (
-                  <div className="loading">加载中...</div>
-                ) : (
-                  <ul className="token-list">
-                    {userTokens.map((token, index) => (
-                      <li key={index} className="token-item">
-                        <div className="token-info">
-                          <span className="token-symbol">{token.symbol}</span>
-                          <span className="token-name">{token.name}</span>
-                        </div>
-                        <div className="token-balance">
-                          <span>{parseFloat(token.balance).toFixed(6)} {token.symbol}</span>
-                          <span className="token-value">
-                            ${(parseFloat(token.balance) * parseFloat(tokenPrices[token.symbol] || token.price)).toFixed(2)}
-                          </span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-
-              <div className="card">
-                <h2>可交易代币</h2>
-                <ul className="token-list">
-                  {availableTokens.map((token, index) => (
-                    <li key={index} className="token-item">
-                      <div className="token-info">
-                        <span className="token-symbol">{token.symbol}</span>
-                        <span className="token-name">{token.name}</span>
-                      </div>
-                      <div className="token-price">
-                        ${parseFloat(tokenPrices[token.symbol] || token.price).toFixed(2)}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <div className="right-panel">
-              <div className="card swap-card">
-                <h2>代币兑换</h2>
-                <div className="swap-form">
-                  <div className="swap-input-group">
-                    <label>发送</label>
-                    <input
-                      type="number"
-                      value={fromAmount}
-                      onChange={(e) => handleFromAmountChange(e.target.value)}
-                      placeholder="输入数量"
-                      step="0.000001"
-                    />
-                    <select value={fromToken} onChange={(e) => handleFromTokenChange(e.target.value)}>
-                      {availableTokens.map((token) => (
-                        <option key={token.address} value={token.symbol}>
-                          {token.symbol}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="swap-arrow">
-                    <button onClick={() => {
-                      const temp = fromToken;
-                      handleFromTokenChange(toToken);
-                      handleToTokenChange(temp);
-                      handleFromAmountChange(toAmount);
-                    }}>
-                      ↓↑
-                    </button>
-                  </div>
-
-                  <div className="swap-input-group">
-                    <label>接收</label>
-                    <input
-                      type="number"
-                      value={toAmount}
-                      onChange={(e) => setToAmount(e.target.value)}
-                      placeholder="预估数量"
-                      readOnly
-                      step="0.000001"
-                    />
-                    <select value={toToken} onChange={(e) => handleToTokenChange(e.target.value)}>
-                      {availableTokens.map((token) => (
-                        <option key={token.address} value={token.symbol}>
-                          {token.symbol}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <button 
-                    className="swap-button" 
-                    onClick={handleSwap}
-                    disabled={isSwapping}
-                  >
-                    {isSwapping ? '兑换中...' : '确认兑换'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {!walletConnected && (
+        
+        {!walletConnected ? (
           <div className="welcome-section">
-            <h2>欢迎使用 BC DEX</h2>
-            <p>请连接您的钱包开始交易</p>
-            <button onClick={connectWallet} style={{ marginTop: '1rem', fontSize: '1.2rem', padding: '1rem 2rem' }}>
+            <h2>欢迎使用 ThenSwap</h2>
+            <p>请连接您的钱包开始使用我们的服务</p>
+            <button className="primary-button" onClick={connectWallet}>
               连接钱包
             </button>
+          </div>
+        ) : (
+          <div className="content-container">
+            {currentPage === 'home' && (
+              <Home 
+                userTokens={userTokens}
+                tokenPrices={tokenPrices}
+                walletConnected={walletConnected}
+              />
+            )}
+            
+            {currentPage === 'swap' && (
+              <Swap 
+                userTokens={userTokens}
+                availableTokens={availableTokens}
+                tokenPrices={tokenPrices}
+                dexContract={dexContract}
+                tokenContracts={tokenContracts}
+                fetchTokenBalances={fetchTokenBalances}
+                isLoading={isLoading}
+              />
+            )}
+            
+            {currentPage === 'liquidity' && (
+              <LiquidityPool 
+                userTokens={userTokens}
+                availableTokens={availableTokens}
+                tokenPrices={tokenPrices}
+                dexContract={dexContract}
+                tokenContracts={tokenContracts}
+                fetchTokenBalances={fetchTokenBalances}
+                isLoading={isLoading}
+              />
+            )}
+            
+            {currentPage === 'nft' && (
+              <NFTMarket 
+                walletAddress={walletAddress}
+                provider={provider}
+                signer={signer}
+              />
+            )}
+            
+            {currentPage === 'staking' && (
+              <Staking 
+                userTokens={userTokens}
+                availableTokens={availableTokens}
+                tokenPrices={tokenPrices}
+                fetchTokenBalances={fetchTokenBalances}
+              />
+            )}
+            
+            {currentPage === 'portfolio' && (
+              <Portfolio 
+                userTokens={userTokens}
+                tokenPrices={tokenPrices}
+                walletAddress={walletAddress}
+              />
+            )}
           </div>
         )}
       </main>
 
       <footer className="footer">
-        <p>BC DEX - 去中心化交易所 © 2024</p>
+        <div className="footer-content">
+          <div className="footer-section">
+            <h3>ThenSwap</h3>
+            <p>去中心化金融平台，提供代币兑换、流动性挖矿、NFT市场和质押服务</p>
+          </div>
+          <div className="footer-section">
+            <h4>功能</h4>
+            <ul>
+              <li>Swap</li>
+              <li>Liquidity Pool</li>
+              <li>NFT Market</li>
+              <li>Staking</li>
+              <li>Portfolio</li>
+            </ul>
+          </div>
+          <div className="footer-section">
+            <h4>社交媒体</h4>
+            <ul>
+              <li>Twitter</li>
+              <li>Discord</li>
+              <li>Telegram</li>
+              <li>GitHub</li>
+            </ul>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <p>&copy; 2024 ThenSwap. All rights reserved.</p>
+        </div>
       </footer>
     </div>
   );
